@@ -1,0 +1,16 @@
+FROM python:3.12-slim
+
+ENV DB_HOST=172.20.0.10
+ENV DB_USER=${MYSQL_USER}
+ENV DB_NAME=${MYSQL_DATABASE}
+ENV DB_PASSWORD=${MYSQL_PASSWORD}
+ENV DB_TABLE=requests
+
+WORKDIR /app
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+COPY main.py ./
+CMD ["python", "main.py"]
+
+# Запускаем приложение с помощью uvicorn, делая его доступным по сети
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"] 

@@ -1,27 +1,31 @@
-version: '3.8'
 services:
 
   reverse-proxy:
-    image: haproxy:2.4
+    image: haproxy
+    container_name: reverse-proxy
     restart: always
-    networks:
-        backend: {}
     ports:
-    - "127.0.0.1:8080:8080"
+    - '127.0.0.1:8080:8080'
     volumes:
-    - ./haproxy/reverse/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:rw 
+    - ./haproxy/reverse/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:rw
+    networks:
+      backend:
+        ipv4_address: 172.20.0.11
 
   ingress-proxy:
-    image: nginx:1.21.1
+    image: nginx:latest
+    container_name: ingress-proxy
     restart: always
-    network_mode: host
     volumes:
     - ./nginx/ingress/default.conf:/etc/nginx/conf.d/default.conf:rw
     - ./nginx/ingress/nginx.conf:/etc/nginx/nginx.conf:rw
+    network_mode: host
 
-networks:
-  backend:
-    driver: bridge
-    ipam:
-     config:
-       - subnet: 172.20.0.0/24
+networks:            # создание сети
+    backend:           # название сети контейнеров
+      driver: bridge   # тип драйвера сети
+      ipam:            # описание параметров сети
+        config:
+          - subnet: 172.20.0.0/24 # подсеть
+            gateway: 172.20.0.1   # шлюз
+        
